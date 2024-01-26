@@ -3,7 +3,7 @@ class Scene(object):
     PLACE_DEPTH = 15.0
     
     def __init__(self):
-        # THe scene keeps a list of nodes that are displayed
+        # The scene keeps a list of nodes that are displayed
         self.node_list = list()
         
         # Keep track of the currently selected node

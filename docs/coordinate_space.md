@@ -21,3 +21,8 @@ from on coordinate space to another coordinate space. To convert a vector $v$ fr
 
 ### Model, World, View, and Projection Coordinate Spaces
 
+To draw an item to the screen, we need to convert between a few different coordinate spaces.
+
+Conversion from eye space to homogeneous clop space is handle by `gluPerspective`, and conversion to normalized device space and viewposrt space is handled by `glViewport`. These two matrices are multiplied toghether and soroted as the `GL_PROJECTION` matrix. We don't need to know the terminoly or the details of how these matrices work for this (...)
+
+We do, however, need to manede the lft hand side of the diagram ourselves. We define a matrix which converts points in the model (also called a mesh) from the model spaces into the world space, called the model matrix. We also define the view matrix, which converts from the world space into the eye space. In this project, we combine these two matrices to obtain the ModelView matrix.

@@ -2,7 +2,7 @@
 
 Before we dive into the `render` function, we should discuss a little bit of linear algebra
 
-### Cordinate Space 
+### Coordinate Space 
 
 For our purposes, a Coordinate Space is a origin point and a set of 3 basis vector, usually the $x, y$ $z$ axes.
 

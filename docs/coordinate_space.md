@@ -12,4 +12,12 @@ Any point in 3 dimensions can be represented as an offset in the $x, y$ and $z$ 
 
 ### Vector
 
-A vector is an $x, y$ and $z$ value representing the difference between two points in the $x, y$ and $z$ axes, respectively. 
+A vector is an $x, y$ and $z$ value representing the difference between two points in the $x, y$ and $z$ axes, respectively.
+
+### Transformation Matrix
+
+In computer graphics, it is convenient to use multiple differente coodinate spaces for different types of points. Transformation matrices convert points 
+from on coordinate space to another coordinate space. To convert a vector $v$ from one coordinate space to another, we multiply by a transformation matrix $M:v = Mv.$ Some common transformation matrices are translations, scaling and rotations.
+
+### Model, World, View, and Projection Coordinate Spaces
+

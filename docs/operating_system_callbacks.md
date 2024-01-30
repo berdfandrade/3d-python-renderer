@@ -91,5 +91,32 @@ def trigger(self, name, * args, **kwargs):
 
 This application-level callback system abstracts away the need of the system to know about operating system input. Each application-level callback represetns a meaningful request within the application. The `Interaction` class acts as a translator between operating system events and application-level events. This means that if we decided to port the modeller to another toolkit in addition to GLUT, we would onlyu need to replace the `Interaction` class with a class that converts the input from the new toolkit into the same set of meaningful application-level callbacks. We use callbacks and arguments in Table 13.1 
 
+#### Table 13.1 - Interaction callback and arguments
 
+| Callback      | Arguments                        | Purpose                                                                         |
+|---------------|----------------------------------|---------------------------------------------------------------------------------|
+| `pick`          | x:number, y:number                | Selects the node at the mouse pointer location.                                  |
+| `move`          | x:number, y:number                | Moves the currently selected node to the mouse pointer location.                |
+| `place`         | shape:string, x:number, y:number  | Places a shape of the specified type at the mouse pointer location.             |
+| `rotate_color`  | forward:boolean                  | Rotates the color of the currently selected node through the list of colors, forwards or backwards. |
+| `scale`         | up:boolean                       | Scales the currently selected node up or down, according to parameter.         |
 
+This simple callback system provides all of the functionality we need for this project. In a production 3D modeller, however, user interface objects are often created and destroyed dynamically. IN that case, we would need a more sophisticated envent listening system, where objects can both register and unregister callback for events.
+
+##### Interfacing with the Scene
+
+In this project, we accomplish camera motion by transforming the scene. In other words. The camera is at a fixed loction and userr input moves the scene instead of moving the camera. The camera is placed at `[0,0,-15]` and facnes the world space origin. (Alternatively, we could change the perspective matrix to move the camera instead of the scene. This design decising has very little impact on the rest of the project.) Revisiting the `render` function in interaction with the scene: rotation and translation. 
+
+#### Rotation the Scene with a Trackball 
+
+We accomplish rotation of the scene by using a _trackball_ algorithm. The trackball is an intuitive interface for manipulating the scene in tree dimensions. Conceptually, a trackball interfacec functions as if the scene was inside a transparent globe. Placing on the surface of the globe and pushing it rotatares the globe. Similarly, clicking the right mouse button and moving it on the screen rotates the scene. You can find out more about the theory on trackball at the [OpenGL Wiki](www.opengl.org/wiki/Object_Mouse_Trackball). In this projectm we use a trackball implementation provaide as part of [Glumpy](https://code.google.com/archive/p/glumpy/source).
+
+We interact with the trackball using the `drag_to` function, with the current location of the mouse as the stating location and the change in mouse location as paramenters
+
+`self.trackball.drag_to(self.mouse_loc[0], self.mouse_loc[1], dx, dy)`
+
+the resulting rotation matrix is `trackball.matrix` in the viewer when the scene is rendered. 
+
+#### Aside : Quaternations 
+
+Rotations are traditionally represented in one of two ways. The first is a rotation value around each axis; you could store this as a 3-tuple of floating point numbers. The other common representation for rotations is a quaternion, an element composed of a vector with x, y, and z coordinates, and a w rotation. Using quaternions has numerous benefits over per-axis rotation; in particular, they are more numerically stable. Using quaternions avoids problems like gimbal lock. The downside of quaternions is that they are less intuitive to work with and harder to understand. If you are brave and would like to learn more about quaternions, you can refer to this [explanation](http://3dgep.com/?p=1815).

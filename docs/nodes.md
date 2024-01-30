@@ -58,4 +58,28 @@ class Cube(Primitive):
         super(Cube, self).__init__()
         self.call_list = G_OBJ_CUBE
     
+
 ```
+
+Rendering nodes is based on the transformation matrices that each node stores. The transformation matrix for a node is the combination of its scaling matrix and its translation matrix. Regardless of the type of the node, the first step to rendering is to set the OpenGL matrices are up to date, we call `render_self` to tell the node to make the necessary OpenGL calls to draw itself. Finally, we undo any changes we made to the OpenGL state for this specific node. We use the `glPushMatrix` and `glPopMatrix` functions in OpenGL to save and restore the state of the ModelView ntrix before and after we render the node. Notice that the node stores its color, location, and scale, and applies these to the OpenGL state before rendering.
+
+If the node is currently selected, we make it emit light. This way, the user has a visual indication of which node they have selected.
+
+For example, the call list for a cube draws the 6 faces of the cube, with the center at the origin and the edges exactly 1 unit long.
+
+```python
+# Pseudocode Cube definition
+# Left face
+((-0.5, -0.5, -0.5), (-0.5, -0.5, 0.5), (-0.5, 0.5, 0.5), (-0.5, 0.5, -0.5)),
+# Back face
+((-0.5, -0.5, -0.5), (-0.5, 0.5, -0.5), (0.5, 0.5, -0.5), (0.5, -0.5, -0.5)),
+# Right face
+((0.5, -0.5, -0.5), (0.5, 0.5, -0.5), (0.5, 0.5, 0.5), (0.5, -0.5, 0.5)),
+# Front face
+((-0.5, -0.5, 0.5), (0.5, -0.5, 0.5), (0.5, 0.5, 0.5), (-0.5, 0.5, 0.5)),
+# Bottom face
+((-0.5, -0.5, 0.5), (-0.5, -0.5, -0.5), (0.5, -0.5, -0.5), (0.5, -0.5, 0.5)),
+# Top face
+((-0.5, 0.5, -0.5), (-0.5, 0.5, 0.5), (0.5, 0.5, 0.5), (0.5, 0.5, -0.5))
+```
+

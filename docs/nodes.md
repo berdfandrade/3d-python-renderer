@@ -6,7 +6,7 @@ Each type of `Node` defines its own behaviour for rendering itself and for any o
 
 The simplest concrete implementation of `Node` is a _primitive_ is a single solid shape that can be added the scene. In this project, the primitives are `Cube` and `Sphere`.
 
-````python
+```python
 class Node(object):
     """ Base class for scene elements """
     def __init__(self):
@@ -58,7 +58,6 @@ class Cube(Primitive):
         super(Cube, self).__init__()
         self.call_list = G_OBJ_CUBE
     
-
 ```
 
 Rendering nodes is based on the transformation matrices that each node stores. The transformation matrix for a node is the combination of its scaling matrix and its translation matrix. Regardless of the type of the node, the first step to rendering is to set the OpenGL matrices are up to date, we call `render_self` to tell the node to make the necessary OpenGL calls to draw itself. Finally, we undo any changes we made to the OpenGL state for this specific node. We use the `glPushMatrix` and `glPopMatrix` functions in OpenGL to save and restore the state of the ModelView ntrix before and after we render the node. Notice that the node stores its color, location, and scale, and applies these to the OpenGL state before rendering.
@@ -83,3 +82,43 @@ For example, the call list for a cube draws the 6 faces of the cube, with the ce
 ((-0.5, 0.5, -0.5), (-0.5, 0.5, 0.5), (0.5, 0.5, 0.5), (0.5, 0.5, -0.5))
 ```
 
+Using only primitives would be quite limiting for modelling applications. 3D models are generally made up of multiple primitives (or triangular meshes, which are outside the scope of this project). Fourtnunely, our design of the `Node` class facilitates `Scene` nodes that are made up of multiples primitives. In fact, we can support arbitrary groupings of nodes with no added complexity.
+
+As motivation, let us consider a very basic figure: a typical snowman, or snow figure, made up of three spheres. Even though the figure is comprise of three separate primitives, we would like to be able to treat it as a single object.
+
+We create a class called `HierarchicalNode`, a Node that contains other nodes. It manages a list of "children". The `render_self` function for hierarchical nodes simply calls `render_self` on each of the child nodes. With the `HierarchicalNode` class, it is very easy to add figures to the scene. Now, defining the snow figure is as simple as specifying the shapes that comprise it, and their relative positions and sizes.
+
+<img src='https://aosabook.org/en/500L/modeller-images/nodes.jpg'/>
+
+
+```python
+class HierarchicalNode(Node):
+    def __init__(self):
+        super(HierarchicalNode, self).__init__()
+        self.child_nodes = []
+
+    def render_self(self):
+        for child in self.child_nodes:
+            child.render()
+```
+
+```python
+class SnowFigure(HierarchicalNode):
+    def __init__(self):
+        super(SnowFigure, self).__init__()
+        self.child_nodes = [Sphere(), Sphere(), Sphere()]
+        self.child_nodes[0].translate(0, -0.6, 0) # scale 1.0
+        self.child_nodes[1].translate(0, 0.1, 0)
+        self.child_nodes[1].scaling_matrix = numpy.dot(
+            self.scaling_matrix, scaling([0.8, 0.8, 0.8]))
+        self.child_nodes[2].translate(0, 0.75, 0)
+        self.child_nodes[2].scaling_matrix = numpy.dot(
+            self.scaling_matrix, scaling([0.7, 0.7, 0.7]))
+        for child_node in self.child_nodes:
+            child_node.color_index = color.MIN_COLOR
+        self.aabb = AABB([0.0, 0.0, 0.0], [0.5, 1.1, 0.5])
+```
+
+You migth observe that the `Node` objects form a tree data structure. The `render` function, through hierarchical nodes, does a depth-fisrt traversal through the tree. As it traverses, it keeps a stack of `ModelView` matrices, used for conversion into the world space. At each step, it pushes the current `ModelView` matrix onto the stack, and when it completes rendering of all child nodes, it pops the matrix off the stack, leaving the parent node's `ModelView` matrix at the top of the stack. 
+
+By making the `Node` class extensible in this way, we can add new types of shapes to the scene without changing any of the other code for scene manipulation and rendering. Using the node concept to abstract away the fact that on `Scene` object may have many children is known as the Composite design pattern. 

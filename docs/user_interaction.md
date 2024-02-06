@@ -30,4 +30,3 @@ class Interaction(object):
         glutKeyboardFunc(self.handle_keystroke)
         glutSpecialFunc(self.handle_keystroke)
 ```
-

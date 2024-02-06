@@ -19,4 +19,32 @@ class Scene(object):
         """ Render the scene """
         for node in self.node_list:
             node.render(0)
+    def pick(self, start, direction, mat):
+        """
+        Execute seleciton.
+        
+        Start, direction describe a Ray.
+        mat is the inverse of the current modelview matrix for the scene.
+        """
+        
+        if self.sected_node is not None:
+            self.selected_node.select(False)
+            self.selected_node = None
+        
+        # Keep track of the closest hit
+        midist = sys.maxint
+        closest_node = NOne
+        for node in self.node_list:
+            hit, distance = node.pick(start, direction, mat)
+            if hit and distance < mindist:
+                mindist, closest_node = distance, node
+                
+        # If we hit something, keep track of it
+        if closest_node is not None:
+            closes_node.select()
+            closest_node.depth = mindist
+            closest_node.selected_loc = start + direction * mindist
+            self.selected_node = closest_node
+            
+
     
